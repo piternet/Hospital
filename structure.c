@@ -166,7 +166,7 @@ int changeDiseaseDescription(char name[], int n, char description[]) {
 		return 1;
 	DiseaseList *prev = NULL; //pointer to diseaseList just before diseaseList to be deleted or NULL if diseaseList to be deleted is first
 	DiseaseList *diseaseToBeDeleted = findDisease(currentPatientList->patient, n, &prev);
-	if(diseaseToBeDeleted == NULL) {
+	if(diseaseToBeDeleted == NULL || diseaseToBeDeleted->disease == NULL) {
 		return 1; // disease with given number doesn't exist
 	}	
 	DiseaseList *next = diseaseToBeDeleted->next; // pointer to diseaseList just after diseaseList to be deleted
@@ -174,10 +174,12 @@ int changeDiseaseDescription(char name[], int n, char description[]) {
 	diseaseToBeDeleted->disease->refCounter = diseaseToBeDeleted->disease->refCounter - 1;
 	if(diseaseToBeDeleted->disease->refCounter == 0) {
 		free(diseaseToBeDeleted->disease->description);
+		diseaseToBeDeleted->disease->description = NULL;
 		free(diseaseToBeDeleted->disease);
+		diseaseToBeDeleted->disease = NULL;
 		amountOfDiseases--;
 	}
-	free(diseaseToBeDeleted);
+	//free(diseaseToBeDeleted);
 	// create new DiseaseList
 	DiseaseList *newDiseaseList = (DiseaseList*) malloc(sizeof(DiseaseList));
 	newDiseaseList->disease = (Disease*) malloc(sizeof(Disease));
@@ -234,20 +236,28 @@ void freeMemory() {
 	// free every allocated memory
 	PatientList *current = patientListHead, *next = NULL;
 	while(current != NULL) {
-		next = current->next;
+		if(current->next != NULL)
+			next = current->next;
 		DiseaseList *diseaseCurrent = current->patient->diseases, *nextDisease = NULL;
 		while(diseaseCurrent != NULL) {
-			nextDisease = diseaseCurrent->next;
+			if(diseaseCurrent->next != NULL)
+				nextDisease = diseaseCurrent->next;
 			if(diseaseCurrent->disease != NULL) {
 				if(diseaseCurrent->disease->description != NULL)
+				{
 					free(diseaseCurrent->disease->description);
+					diseaseCurrent->disease->description = NULL;
+				}
 				free(diseaseCurrent->disease);
 			}
 			free(diseaseCurrent);
 			diseaseCurrent = nextDisease;
 		}
 		if(current->patient != NULL)
+		{
+			free(current->patient->name);
 			free(current->patient);
+		}
 		free(current);
 		current = next;
 	}

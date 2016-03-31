@@ -8,7 +8,7 @@ do
 	filename=${fullname%.*} #file name without extension
 	outFile=$filename".out"
 	errFile=$filename".err"
-	./szpital -v < $f > tmp.out 2> /dev/null
+	./szpital < $f > tmp.out 2> /dev/null
 	result=$(diff tmp.out tests/$outFile)
 	if [ $? -eq 0 ] 
 	then
