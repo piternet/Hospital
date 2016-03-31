@@ -88,14 +88,13 @@ void pushDisease(Patient *patient, char *description) {
 
 //returns poiter to n-th disease of given patient or NULL if such disease is not found
 DiseaseList* findDisease(Patient *patient, int n) { 
-	DiseaseList *ptr = patient->diseases, *tmp = NULL; //tmp = NULL means no prev
+	DiseaseList *ptr = patient->diseases;
 	int it = 1; //iterator for counting disease descriptions
 	while(ptr != NULL) {
 		if(it == n)
 		{
 			return ptr;
 		}
-		tmp = ptr;
 		ptr = ptr->next;
 		it++;
 	}
