@@ -21,6 +21,6 @@ int main(int argc, char **argv) {
 		}
 	}
 	getInput(parametr);
-	//freeMemory();
+	freeMemory();
 	return 0;
 }

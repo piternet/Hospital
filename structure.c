@@ -87,13 +87,12 @@ void pushDisease(Patient *patient, char *description) {
 
 
 //returns poiter to n-th disease of given patient or NULL if such disease is not found
-DiseaseList* findDisease(Patient *patient, int n, DiseaseList **prev) { 
+DiseaseList* findDisease(Patient *patient, int n) { 
 	DiseaseList *ptr = patient->diseases, *tmp = NULL; //tmp = NULL means no prev
 	int it = 1; //iterator for counting disease descriptions
 	while(ptr != NULL) {
 		if(it == n)
 		{
-			*prev = tmp;
 			return ptr;
 		}
 		tmp = ptr;
@@ -164,37 +163,25 @@ int changeDiseaseDescription(char name[], int n, char description[]) {
 	PatientList *currentPatientList = findPatient(name);
 	if(currentPatientList == NULL) // patient doesn't exist, return error code 
 		return 1;
-	DiseaseList *prev = NULL; //pointer to diseaseList just before diseaseList to be deleted or NULL if diseaseList to be deleted is first
-	DiseaseList *diseaseToBeDeleted = findDisease(currentPatientList->patient, n, &prev);
-	if(diseaseToBeDeleted == NULL || diseaseToBeDeleted->disease == NULL) {
+	DiseaseList *currentDiseaseList = findDisease(currentPatientList->patient, n);
+	if(currentDiseaseList == NULL) {
 		return 1; // disease with given number doesn't exist
 	}	
-	DiseaseList *next = diseaseToBeDeleted->next; // pointer to diseaseList just after diseaseList to be deleted
-	// delete our DiseaseList and disease if it's not used by someone else
-	diseaseToBeDeleted->disease->refCounter = diseaseToBeDeleted->disease->refCounter - 1;
-	if(diseaseToBeDeleted->disease->refCounter == 0) {
-		free(diseaseToBeDeleted->disease->description);
-		diseaseToBeDeleted->disease->description = NULL;
-		free(diseaseToBeDeleted->disease);
-		diseaseToBeDeleted->disease = NULL;
+	// delete our disease if it's not used by someone else
+	currentDiseaseList->disease->refCounter = currentDiseaseList->disease->refCounter - 1;
+	if(currentDiseaseList->disease->refCounter == 0) {
+		free(currentDiseaseList->disease->description);
+		currentDiseaseList->disease->description = NULL;
+		free(currentDiseaseList->disease);
+		currentDiseaseList->disease = NULL;
 		amountOfDiseases--;
 	}
-	//free(diseaseToBeDeleted);
-	// create new DiseaseList
-	DiseaseList *newDiseaseList = (DiseaseList*) malloc(sizeof(DiseaseList));
-	newDiseaseList->disease = (Disease*) malloc(sizeof(Disease));
-	newDiseaseList->disease->description = (char*) malloc((strlen(description)+1)*sizeof(char));
-	strcpy(newDiseaseList->disease->description, description);
-	newDiseaseList->disease->refCounter = 1;
-	newDiseaseList->next = next;
+	// create new disease
+	currentDiseaseList->disease = (Disease*) malloc(sizeof(Disease));
+	currentDiseaseList->disease->description = (char*) malloc((strlen(description)+1)*sizeof(char));
+	strcpy(currentDiseaseList->disease->description, description);
+	currentDiseaseList->disease->refCounter = 1;
 	amountOfDiseases++;
-	// join our new DiseaseList into existing DiseaseList
-	if(prev == NULL) {
-		currentPatientList->patient->diseases = newDiseaseList;
-	}
-	else {
-		prev->next = newDiseaseList;
-	}
 	return 0;
 }
 
@@ -203,8 +190,7 @@ const char* getPatientDescription(char name[], int n) {
 	if(currentPatientList == NULL)
 		return NULL;
 	Patient *patient = currentPatientList->patient;
-	DiseaseList *tmp = NULL;
-	DiseaseList *diseaseList = findDisease(patient, n, &tmp);
+	DiseaseList *diseaseList = findDisease(patient, n);
 	if(diseaseList == NULL)
 		return NULL;
 	return diseaseList->disease->description;
@@ -234,31 +220,24 @@ int deletePatient(char name[]) {
 
 void freeMemory() {
 	// free every allocated memory
-	PatientList *current = patientListHead, *next = NULL;
-	while(current != NULL) {
-		if(current->next != NULL)
-			next = current->next;
-		DiseaseList *diseaseCurrent = current->patient->diseases, *nextDisease = NULL;
-		while(diseaseCurrent != NULL) {
-			if(diseaseCurrent->next != NULL)
-				nextDisease = diseaseCurrent->next;
-			if(diseaseCurrent->disease != NULL) {
-				if(diseaseCurrent->disease->description != NULL)
-				{
-					free(diseaseCurrent->disease->description);
-					diseaseCurrent->disease->description = NULL;
-				}
-				free(diseaseCurrent->disease);
+	PatientList *currentPatientList = patientListHead, *nextPatientList = NULL;
+	while(currentPatientList != NULL) {
+		nextPatientList = currentPatientList->next;
+		DiseaseList *currentDiseaseList = currentPatientList->patient->diseases, *nextDiseaseList = NULL;
+		while(currentDiseaseList != NULL) {
+			nextDiseaseList = currentDiseaseList->next;
+			currentDiseaseList->disease->refCounter = currentDiseaseList->disease->refCounter - 1;
+			if(currentDiseaseList->disease->refCounter == 0) {
+				free(currentDiseaseList->disease->description);
+				free(currentDiseaseList->disease);
 			}
-			free(diseaseCurrent);
-			diseaseCurrent = nextDisease;
+			currentDiseaseList->disease = NULL;
+			free(currentDiseaseList);
+			currentDiseaseList = nextDiseaseList;
 		}
-		if(current->patient != NULL)
-		{
-			free(current->patient->name);
-			free(current->patient);
-		}
-		free(current);
-		current = next;
+		free(currentPatientList->patient->name);
+		free(currentPatientList->patient);
+		free(currentPatientList);
+		currentPatientList = nextPatientList;
 	}
 }
