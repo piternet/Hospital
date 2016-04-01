@@ -11,10 +11,7 @@
 #include "structure.h"
 #include "parse.h"
 
-void printAmountOfDiseases() {
-	fprintf(stderr, "DESCRIPTIONS: %d\n", amountOfDiseases);
-}
-
+// function parses one line of input, extracting command which has got to be executed and its arguments
 void parseLine(char buffer[], int parametr) {
 	char *command = strtok(buffer, " "); // first word in the line, which indicates what operation needs to be done
 	if(strcmp(command, NEW_DISEASE_ENTER_DESCRIPTION) == 0) {
@@ -26,7 +23,6 @@ void parseLine(char buffer[], int parametr) {
 		else {
 			printf("%s", CMD_IGNORED);
 		}
-		//printf("%s choruje na chorobe: %s", name, diseaseDescription);
 	}
 	else if (strcmp(command, NEW_DISEASE_COPY_DESCRIPTION) == 0) {
 		char *name1 = strtok(NULL, " "), *name2 = strtok(NULL, "");
@@ -36,12 +32,10 @@ void parseLine(char buffer[], int parametr) {
 		else {
 			printf("%s", CMD_IGNORED);
 		}
-		//printf("kopiuje od %s do %s ", name2, name1);
 	}
 	else if(strcmp(command, CHANGE_DESCRIPTION) == 0) {
 		char *name = strtok(NULL, " "), *chNumOfDisease = strtok(NULL, " ");
 		char *diseaseDescription = strtok(NULL, ""); // just the rest of buffer, i.e. description of the disease
-		//printf("zmieniam ziomkowi %s chorobe nr %s na %s", name, chNumOfDisease, diseaseDescription);
 		int numOfDisease = atoi(chNumOfDisease);
 		if(changeDiseaseDescription(name, numOfDisease, diseaseDescription) == 0) {
 			printf("%s", CMD_DONE);
@@ -69,17 +63,17 @@ void parseLine(char buffer[], int parametr) {
 		else {
 			printf("%s", CMD_IGNORED);
 		}
-		//printf("usuwam ziomka o imieniu %s", name);
 	}
 	else {
-		printf("UNKNOWN COMMAND");
+		printf("UNKNOWN COMMAND"); // in case commmand is unknown
 	}
 	printf("\n");
-	if(parametr == 1) {
-		printAmountOfDiseases();
+	if(parametr == 1) { // parametr given in specification, used to print amount of unique descriptions stored in memory
+		fprintf(stderr, "DESCRIPTIONS: %d\n", getAmountOfDiseases()); // prints it to the standar error stream
 	}
 }
 
+// function gets input from standard input 
 void getInput(int parametr) {
 	int i = 0; // iterator for buffer
 	char buffer[MAX_BUFF_SIZE];

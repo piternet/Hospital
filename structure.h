@@ -37,6 +37,7 @@ int changeDiseaseDescription(char[], int, char[]);
 const char* getPatientDescription(char[], int);
 int deletePatient(char[]);
 
+void getAmountOfDescriptions();
 void freeMemory();
 
 #endif /* STRUCTURE_H_ */

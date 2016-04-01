@@ -11,8 +11,13 @@
 
 PatientList *patientListHead = NULL; // list of all patients
 PatientList *lastPatient = NULL; // pointer to last patient
-int amountOfDiseases = 0;
+int amountOfDiseases = 0; // global variable, storing amount of unique diseases
 
+void getAmountOfDiseases() {
+	return amountOfDiseases;
+}
+
+// function adds patient with given name to the end of patients list
 PatientList* addPatient(char *name) {
 	if(patientListHead == NULL) { // patientList if empty
 		patientListHead = (PatientList*) malloc(sizeof(PatientList));
@@ -40,9 +45,9 @@ PatientList* addPatient(char *name) {
 	}
 }
 
+// function finds if there is patient with given name; returns NULL if not
 PatientList* findPatient(char *name) {
-	/* finds if there is patient with given  name
-	 returns NULL if not */
+	/* f */
 	PatientList *ptr = patientListHead;
 	while(ptr != NULL) {
 		if(strcmp(ptr->patient->name, name) == 0)
@@ -52,16 +57,7 @@ PatientList* findPatient(char *name) {
 	return NULL;
 }
 
-/*void printAllDiseases(Patient *patient) {
-	printf("Wszystkie choroby pacjenta to: \n");
-	DiseaseList *ptr = patient->diseases;
-	while(ptr != NULL) {
-		printf("%s, ", ptr->disease->description);
-		ptr = ptr->next;
-	}
-}*/
-
-// function adds disease to the end of patient's diseases list
+// function creates new disease with given description and adds it to the end of patient's diseases list
 void pushDisease(Patient *patient, char *description) {
 	if(patient->diseases == NULL) { // list of diseases is empty
 		patient->diseases = (DiseaseList*) malloc(sizeof(DiseaseList)); // makes space for list of diseases
@@ -86,7 +82,7 @@ void pushDisease(Patient *patient, char *description) {
 }
 
 
-//returns poiter to n-th disease of given patient or NULL if such disease is not found
+// returns poiter to n-th disease of given patient or NULL if such disease is not found
 DiseaseList* findDisease(Patient *patient, int n) { 
 	DiseaseList *ptr = patient->diseases;
 	int it = 1; //iterator for counting disease descriptions
@@ -101,12 +97,14 @@ DiseaseList* findDisease(Patient *patient, int n) {
 	return NULL;
 }
 
+// function returns last disease of given patient or NULL if there are no diseases
 Disease* getLastDisease(Patient *patient) {
 	if(patient->diseases == NULL)
 		return NULL;
 	return patient->lastDisease->disease;
 }
 
+// function adds given disease to the end of patient's diseases list
 void pushCopiedDisease(Patient *patient, Disease *disease) {
 	if(patient->diseases == NULL) { // list of diseases is empty
 		patient->diseases = (DiseaseList*) malloc(sizeof(DiseaseList)); // makes space for list of diseases
@@ -145,15 +143,8 @@ int copyDiseaseDescription(char name1[], char name2[]) {
 		currentPatientList1 = addPatient(name1);
 	Disease *disease = getLastDisease(currentPatientList2->patient);
 	if(disease == NULL)
-		return 1; // error code, patient with name2 doesn't have any diseases, so nothing can be copied
-	//printf(" %s ma teraz opis %s\n", currentPatientList1->patient->name, disease->description);
+		return 1; // error code, patient with name2 doesn't have any diseases, so nothing can be copiedion);
 	pushCopiedDisease(currentPatientList1->patient, disease);
-	//printf(" %s ma teraz opis %s\n", currentPatientList1->patient->name, currentPatientList1->patient->diseases->disease->description);
-	/*if(getLastDisease(currentPatientList1->patient) != getLastDisease(currentPatientList2->patient))
-	{
-		printf("MAMY PROBLEM!");
-		printf("\n pierwszy: %s drugi: %s\n", currentPatientList1->patient->diseases->disease->description, currentPatientList2->patient->diseases->disease->description);
-	}*/ //zrobic z tego assert
 	return 0;
 }
 
@@ -202,9 +193,9 @@ int deletePatient(char name[]) {
 	DiseaseList *ptr = currentPatientList->patient->diseases;
 	while(ptr != NULL) {
 		DiseaseList *next = ptr->next;
-		// there are 3 thing to free: DiseaseList, Disease, Description - But Disease can only be freed when refCounter == 0
 		Disease *disease = ptr->disease;
 		disease->refCounter = disease->refCounter - 1; 
+		// disease and description can only be freed when no one else uses it, i.e. refCounter == 0
 		if(disease->refCounter == 0) {
 			free(disease->description);
 			free(disease);
@@ -217,8 +208,8 @@ int deletePatient(char name[]) {
 	return 0;
 }
 
+// function frees free every allocated memory
 void freeMemory() {
-	// free every allocated memory
 	PatientList *currentPatientList = patientListHead, *nextPatientList = NULL;
 	while(currentPatientList != NULL) {
 		nextPatientList = currentPatientList->next;
@@ -226,6 +217,7 @@ void freeMemory() {
 		while(currentDiseaseList != NULL) {
 			nextDiseaseList = currentDiseaseList->next;
 			currentDiseaseList->disease->refCounter = currentDiseaseList->disease->refCounter - 1;
+			// disease and description can only be freed when no one else uses it, i.e. refCounter == 0
 			if(currentDiseaseList->disease->refCounter == 0) {
 				free(currentDiseaseList->disease->description);
 				free(currentDiseaseList->disease);
