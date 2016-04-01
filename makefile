@@ -2,7 +2,8 @@ CC = gcc
 # -O2 for optimalization, -Wall for turing on most compiler warning, -std=c99 for c99 standard
 CFLAGS = -O2 -Wall -std=c99
 # target executable fle
-TARGET = szpital
+TARGET = hospital
+TARGET_DBG = hospital.dbg
 
 all: $(TARGET)
 
@@ -18,6 +19,10 @@ parse.o: parse.h structure.h parse.c
 hospital.o: parse.h structure.h hospital.c
 	$(CC) $(CFLAGS) -c hospital.c
 
+debug: TARGET = hospital.dbg
+debug: CFLAGS += -g
+debug: all
+
 .PHONY: clean
 clean:
-	$(RM) $(TARGET) *.o *~	
+	$(RM) $(TARGET) $(TARGET_DBG) *.o *~	

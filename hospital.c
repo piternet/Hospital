@@ -19,6 +19,10 @@ int main(int argc, char **argv) {
 		if(strcmp(argv[1], V_PARAMETR) == 0) {
 			parametr = 1; // there is V_PARAMETR parametr
 		}
+		else { // program is executed with other parametr
+			printf("ERROR");
+			return 1; // error code 1
+		}
 	}
 	getInput(parametr);
 	freeMemory();

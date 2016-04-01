@@ -11,7 +11,7 @@
 
 typedef struct Disease {
 	char *description;
-	int refCounter;
+	int refCounter; // reference counter - counts how many patients are 'using' this disease at some moment
 } Disease;
 
 typedef struct DiseaseList {
@@ -22,7 +22,7 @@ typedef struct DiseaseList {
 typedef struct Patient {
 	char *name; 
 	DiseaseList *diseases;
-	DiseaseList *lastDisease;
+	DiseaseList *lastDisease; // pointer to last disease of patient, enables to add new diseases in O(1)
 } Patient;
 
 typedef struct PatientList {
