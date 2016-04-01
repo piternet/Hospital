@@ -9,11 +9,32 @@
 #include <stdlib.h>
 #include <string.h>
 
+typedef struct Disease {
+	char *description;
+	int refCounter;
+} Disease;
+
+typedef struct DiseaseList {
+	Disease *disease;
+	struct DiseaseList *next;
+} DiseaseList;
+
+typedef struct Patient {
+	char *name; 
+	DiseaseList *diseases;
+	DiseaseList *lastDisease;
+} Patient;
+
+typedef struct PatientList {
+	Patient *patient;
+	struct PatientList *next;
+} PatientList;
+
 PatientList *patientListHead = NULL; // list of all patients
 PatientList *lastPatient = NULL; // pointer to last patient
 int amountOfDiseases = 0; // global variable, storing amount of unique diseases
 
-void getAmountOfDiseases() {
+int getAmountOfDiseases() {
 	return amountOfDiseases;
 }
 

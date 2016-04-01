@@ -23,5 +23,5 @@ do
 	else
 		echo "ERROR .err"
 	fi
-	
+	rm tmp.out tmp.err
 done
