@@ -1,7 +1,15 @@
 #!/bin/bash
 
 # iterate all .in files in /tests directory
-for f in tests/*.in
+if [ "$1" == "-v" ]
+then
+	prog=$2
+	directory=$3
+else
+	prog=$1
+	directory=$2
+fi
+for f in $directory/*.in
 do
 	echo "Test nr $f: "
 	fullname=$(basename S$f)
@@ -16,12 +24,15 @@ do
 	else
 		echo "ERROR .out"
 	fi
-	result=$(diff tmp.err tests/$errFile)
-	if [ $? -eq 0 ] 
+	if [ "$1" == "-v" ]
 	then
-		echo "OK .err"
-	else
-		echo "ERROR .err"
+		result=$(diff tmp.err tests/$errFile)
+		if [ $? -eq 0 ]
+		then
+			echo "OK .err"
+		else
+			echo "ERROR .err"
+		fi
 	fi
 	rm tmp.out tmp.err
 done
