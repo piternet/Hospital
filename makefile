@@ -25,4 +25,4 @@ debug: all
 
 .PHONY: clean
 clean:
-	$(RM) $(TARGET) $(TARGET_DBG) *.o *~	
+	$(RM) $(TARGET) $(TARGET_DBG) *.o *~debug: TARGET = hospital.dbg

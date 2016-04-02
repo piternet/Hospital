@@ -224,6 +224,7 @@ int deletePatient(char name[]) {
 		}
 		free(ptr);
 		ptr = next;
+		
 	}
 	currentPatientList->patient->diseases = NULL;
 	return 0;
